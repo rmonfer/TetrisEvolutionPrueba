@@ -694,12 +694,12 @@ html[data-device=desktop] #chat{width:340px}
 
 <script>
 // ===== v16: capa de red alternativa con Supabase (solo si NO existe el runtime de Claude) =====
-const SB_URL = "https://lxelgaifbfqxsehzdnam.supabase.co/rest/v1/", SB_KEY = "sb_publishable_Z0X-a3uMYsZTJkwXz1OAow_mDkj7KkE"; // opcional: pega aquí tu Project URL y tu clave anon (pública). También se pueden poner en Configuración → Datos.
-const SB = (() => { let u = "", k = ""; try { u = localStorage.getItem("tetrisSbUrl") || ""; k = localStorage.getItem("tetrisSbKey") || ""; } catch (e) {} return {url: u || SB_URL, key: k || SB_KEY}; })();
+const SB_URL = "https://lxelgaifbfqxsehzdnam.supabase.co", SB_KEY = "sb_publishable_Z0X-a3uMYsZTJkwXz1OAow_mDkj7KkE"; // opcional: pega aquí tu Project URL y tu clave anon (pública). También se pueden poner en Configuración → Datos.
+const SB = (() => { let u = "", k = ""; try { u = localStorage.getItem("tetrisSbUrl") || ""; k = localStorage.getItem("tetrisSbKey") || ""; } catch (e) {} return {url: (u || SB_URL).trim().replace(/\/(rest|auth|realtime|storage)\/.*$/, "").replace(/\/+$/, ""), key: (k || SB_KEY).trim()}; })();
 let sbClient = null;
 if (typeof claude === "undefined" && SB.url && SB.key) {
   const tabId = crypto.randomUUID ? crypto.randomUUID() : String(Math.random()).slice(2);
-  const lib = new Promise((res, rej) => { const el = document.createElement("script"); el.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"; el.onload = res; el.onerror = rej; document.head.appendChild(el); });
+  const lib = new Promise((res, rej) => { const el = document.createElement("script"); el.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.js"; el.onload = res; el.onerror = rej; document.head.appendChild(el); });
   const ready = lib.then(async () => {
     sbClient = window.supabase.createClient(SB.url, SB.key);
     const g = await sbClient.auth.getSession();
@@ -1265,7 +1265,7 @@ async function netReady() {
     await net.presence({role: "p", n: account.name, rdy: true, pl: false, d: false, b: "", a: {}, g: 0, sc: 0, ln: 0, rl: ROOMCFG, tm: (MYTEAM = autoTeam())});
     openLobby();
     netCheck();
-  } catch (e) { setNet("No se pudo entrar en la sala. Inténtalo de nuevo."); }
+  } catch (e) { setNet("No se pudo entrar en la sala: " + ((e && e.message) || e)); }
 }
 function startMatch() { rdyNet = false; started = true; reset(); }
 function netCheck() {
@@ -3049,7 +3049,7 @@ setInterval(() => {
 }, 700);
 
 // ===== v16: interfaz de conexión e inicio de sesión (Supabase) =====
-$("sub-dat").insertAdjacentHTML("beforeend", '<h4>CONEXIÓN SUPABASE (online sin Claude)</h4><input id="sbUrl" placeholder="Project URL: https://xxxx.supabase.co" autocomplete="off"><input id="sbKey" placeholder="Clave anon (pública)" autocomplete="off"><button id="sbSave" class="ghost">GUARDAR Y RECARGAR</button><button id="sbClear" class="ghost">QUITAR CONFIGURACIÓN</button><p class="desc" id="sbMsg"></p>');
+$("sub-dat").insertAdjacentHTML("beforeend", '<h4>CONEXIÓN SUPABASE (online sin Claude)</h4><input id="sbUrl" placeholder="Project URL: https://xxxx.supabase.co" autocomplete="off"><input id="sbKey" placeholder="Clave pública (sb_publishable_... o anon)" autocomplete="off"><button id="sbSave" class="ghost">GUARDAR Y RECARGAR</button><button id="sbClear" class="ghost">QUITAR CONFIGURACIÓN</button><p class="desc" id="sbMsg"></p>');
 $("sbUrl").value = SB.url; $("sbKey").value = SB.key;
 $("sbMsg").textContent = typeof claude !== "undefined" && !sbClient ? "Se está usando el runtime de Claude (no se necesita Supabase aquí)." : SB.url ? "Configurado: " + SB.url : "Sin configurar. Solo funcionará fuera de claude.ai.";
 $("sbSave").addEventListener("click", () => { try { localStorage.setItem("tetrisSbUrl", $("sbUrl").value.trim()); localStorage.setItem("tetrisSbKey", $("sbKey").value.trim()); } catch (e) {} location.reload(); });
