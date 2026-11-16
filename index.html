@@ -694,7 +694,7 @@ html[data-device=desktop] #chat{width:340px}
 
 <script>
 // ===== v16: capa de red alternativa con Supabase (solo si NO existe el runtime de Claude) =====
-const SB_URL = "", SB_KEY = ""; // opcional: pega aquí tu Project URL y tu clave anon (pública). También se pueden poner en Configuración → Datos.
+const SB_URL = "https://lxelgaifbfqxsehzdnam.supabase.co/rest/v1/", SB_KEY = "sb_publishable_Z0X-a3uMYsZTJkwXz1OAow_mDkj7KkE"; // opcional: pega aquí tu Project URL y tu clave anon (pública). También se pueden poner en Configuración → Datos.
 const SB = (() => { let u = "", k = ""; try { u = localStorage.getItem("tetrisSbUrl") || ""; k = localStorage.getItem("tetrisSbKey") || ""; } catch (e) {} return {url: u || SB_URL, key: k || SB_KEY}; })();
 let sbClient = null;
 if (typeof claude === "undefined" && SB.url && SB.key) {
